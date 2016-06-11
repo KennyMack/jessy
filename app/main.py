@@ -2,7 +2,7 @@
 from core import app as a
 
 def main():
-	app = a.Application('Authorize')
+	app = a.Application('app.json')
 	app.loadEnv()
 	print('hello')
 

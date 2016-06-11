@@ -1,0 +1,7 @@
+{
+  "name": "Authorize",
+  "version": "1.0.0",
+  "description": "A auth test",
+  "author": "Kenny Mack",
+  "settings": "settings.py"
+}
