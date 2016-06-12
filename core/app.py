@@ -1,15 +1,19 @@
 #!/usr/bin/python3
 from core.environ import environ
+from core.database.sqlite3.Connection import Connection
+from core.database.sqlite3.Command import Command
+from core.database.sql.conditions import Condition, Operation
+from core.database.sql import sql_text
 from importlib.machinery import SourceFileLoader
 import json
+import os
 
 
 class Application(object):
     def __init__(self, path):
         with open(path) as data_file:
-            data = json.load(data_file)
 
-            environ.set_env('JESSY_PROGRAM_DEBUG', 'True')
+            data = json.load(data_file)
 
             if data.get('name'):
                 self.name = data.get('name')
@@ -24,13 +28,35 @@ class Application(object):
                 environ.set_env('JESSY_AUTHOR', self.author)
 
             if data.get('settings'):
-                self.settings = SourceFileLoader("settings", data.get('settings')).load_module()
+                self.settings = SourceFileLoader("settings",
+                                                 data.get('settings')) \
+                                .load_module()
 
                 if hasattr(self.settings, 'DATABASE'):
-                    print(self.settings.DATABASE)
+                    self.connection = Connection(self.settings)
+                    self.command = Command(self.connection)
+                    where = sql_text.add_condition(
+                        ((Condition.AND, 'jessy', 'name', Operation.EQUAL),
+                         (Condition.OR, 'jessy', 'id', Operation.EQUAL),)
+                    )
+
+                    print(self.command.select(('name', ), 'jessy',
+                                    condition= (where),
+                                    params=('he', 1)).all()
+                          )
+
+                    self.command.insert(('name',), 'jessy',
+                                        params=('di',))
+
+                    print(self.command.last_id)
 
                 if hasattr(self.settings, 'PROGRAM_DEBUG'):
-                    environ.set_env('JESSY_PROGRAM_DEBUG', str(self.settings.PROGRAM_DEBUG))
+                    environ.set_env('JESSY_PROGRAM_DEBUG',
+                                    str(self.settings.PROGRAM_DEBUG))
+            else :
+                print('settings.py has not found')
+                return
+
 
     def loadEnv(self):
         environ.loadEnv('default.env')
