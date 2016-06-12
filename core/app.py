@@ -35,20 +35,42 @@ class Application(object):
                 if hasattr(self.settings, 'DATABASE'):
                     self.connection = Connection(self.settings)
                     self.command = Command(self.connection)
-                    where = sql_text.add_condition(
-                        ((Condition.AND, 'jessy', 'name', Operation.EQUAL),
-                         (Condition.OR, 'jessy', 'id', Operation.EQUAL),)
-                    )
+                    #where = sql_text.add_condition(
+                    #    ((Condition.AND, 'jessy', 'name', Operation.EQUAL),
+                    #     (Condition.OR, 'jessy', 'id', Operation.EQUAL),)
+                    #)
 
-                    print(self.command.select(('name', ), 'jessy',
-                                    condition= (where),
-                                    params=('he', 1)).all()
-                          )
+                    #print(self.command.select(('name', ), 'jessy',
+                    #                condition= (where),
+                    #                params=('he', 1)).all()
+                    #      )
 
-                    self.command.insert(('name',), 'jessy',
-                                        params=('di',))
+                    #self.command.insert(('name',), 'jessy',
+                    #                    params=('di',))
 
-                    print(self.command.last_id)
+                    #print(self.command.last_id)
+
+                    #where = sql_text.add_condition(
+                    #    ((Condition.OR, 'jessy', 'id', Operation.EQUAL),)
+                    #)
+                    #print(self.command.last_id)
+
+
+                    #ret = self.command.delete(
+                    #    'jessy',
+                    #    condition= (where),
+                    #    params=(8,)
+                    #)
+
+                    #print(ret)
+
+                    #ret = self.command.update(('name',),
+                    #                    'jessy',
+                    #                    condition= (where),
+                    #                    auto_commit=False,
+                    #                    params= ('hella', 11))
+
+                    #print(ret)
 
                 if hasattr(self.settings, 'PROGRAM_DEBUG'):
                     environ.set_env('JESSY_PROGRAM_DEBUG',
@@ -60,3 +82,19 @@ class Application(object):
 
     def loadEnv(self):
         environ.loadEnv('default.env')
+
+
+    def get_command(self):
+        if hasattr(self.settings, 'DATABASE'):
+            return self.command
+        else:
+            print('Database has not found in settings.py')
+            return None
+
+
+    def get_connection(self):
+        if hasattr(self.settings, 'DATABASE'):
+            return self.connection
+        else:
+            print('Database has not found in settings.py')
+            return None

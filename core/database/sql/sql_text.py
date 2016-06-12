@@ -27,6 +27,38 @@ def get_insert_sql(columns, table):
     return "\r\n".join(sql)
 
 
+def get_update_sql(columns, table, **kwargs):
+    sql = []
+    sql.append('update')
+    sql.append(table)
+    sql.append('set')
+
+    cols = []
+    for col in columns:
+        cols.append("{0} = ?".format(col))
+    sql.append(",\r\n".join(cols))
+
+    if kwargs.get('condition'):
+        sql.append('where')
+        sql.append(kwargs['condition'][3:])
+
+    return "\r\n".join(sql)
+
+
+
+def get_delete_sql(table, **kwargs):
+    sql = []
+    sql.append('delete')
+    sql.append('from')
+    sql.append(table)
+
+    if kwargs.get('condition'):
+        sql.append('where')
+        sql.append(kwargs['condition'][3:])
+
+
+    return '\r\n'.join(sql)
+
 
 def get_select_sql(columns, table, **kwargs):
     sql = []

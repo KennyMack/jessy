@@ -43,7 +43,8 @@ class Command(object):
                 self.connection.commit()
                 self.connection.close()
 
-        return self
+            return self.cursor.rowcount > 0
+        return False
 
 
     def all(self):
@@ -66,23 +67,45 @@ class Command(object):
         print('fim')
 
 
-#a = Command('')
-#
-#a.insert(('col1', 'col2',), 'jessy')
-#
-#a.select((sql_text.table_column('dummy', 'col1'),'col2','col4','col3'),
-#         'dummy',
-#         join=(
-#            sql_text.table_join(
-#                { 'dummy': ('col1', ) },
-#                { 'tblow': ('col1', ) }
-#            )
-#         ),
-#         condition=(
-#             sql_text.add_condition(
-#                ((Condition.AND, 'dummy', 'col1', Operation.EQUAL),
-#                (Condition.AND, 'dummy', 'col1', Operation.EQUAL))
-#            )
-#         )
-#         ).conn()
-#
+    def delete(self, table, **kwargs):
+        self.connection.connect()
+        self.cursor = self.connection.db.cursor()
+
+        self.sql_command = sql_text.get_delete_sql(
+            table,
+            **kwargs
+        )
+
+        if kwargs.get('params'):
+            self.cursor.execute(self.sql_command,
+                                kwargs.get('params'))
+        else:
+            self.cursor.execute(self.sql_command)
+
+        if kwargs.get('auto_commit', True):
+            self.connection.commit()
+            self.connection.close()
+
+        return self.cursor.rowcount > 0
+
+
+    def update(self, fields, table, **kwargs):
+        if kwargs.get('params'):
+            self.connection.connect()
+            self.cursor = self.connection.db.cursor()
+
+            self.sql_command = sql_text.get_update_sql(
+                fields,
+                table,
+                **kwargs
+            )
+
+            self.cursor.execute(self.sql_command,
+                                kwargs.get('params'))
+
+            if kwargs.get('auto_commit', True):
+                self.connection.commit()
+                self.connection.close()
+
+            return self.cursor.rowcount > 0
+        return False
